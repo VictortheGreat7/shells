@@ -1,34 +1,6 @@
 #include "main.h"
 
 /**
-* find_builtin_command - Checks if the command is a builtin
-* @vars: Pointer to the struct of shell variables
-* Return: Returns a pointer to the function or NULL
-*/
-void (*find_builtin_command(vars_t *vars))(vars_t *vars)
-{
-builtins_t builtins[] = {
-{"exit", perform_exit},
-{"env", print_env},
-{"setenv", add_env_variable},
-{"unsetenv", remove_env_variable},
-{NULL, NULL}
-};
-builtins_t *builtin;
-
-for (builtin = builtins; builtin->name != NULL; ++builtin)
-{
-if (_strcmpr(vars->av[0], builtin->name) == 0)
-{
-printf("Built-in command '%s' found\n", builtin->name);
-return (builtin->f);
-}
-}
-printf("Built-in command not found\n");
-return (NULL);
-}
-
-/**
 * perform_exit - Exits the shell
 * @vars: Pointer to the struct of shell variables
 * Return: Nothing
@@ -37,7 +9,6 @@ void perform_exit(vars_t *vars)
 {
 int exit_status;
 
-printf("Executing perform_exit function\n");
 if (_strcmpr(vars->av[0], "exit") == 0 && vars->av[1] != NULL)
 {
 exit_status = _atoi(vars->av[1]);
@@ -71,7 +42,6 @@ void print_env(vars_t *vars)
 {
 unsigned int i;
 
-printf("Executing print_env function\n");
 for (i = 0; vars->env[i]; i++)
 {
 _puts(vars->env[i]);
@@ -90,7 +60,6 @@ void add_env_variable(vars_t *vars)
 char **existing_var;
 char *new_value;
 
-printf("Executing add_env_variable function\n");
 if (vars->av[1] == NULL || vars->av[2] == NULL)
 {
 print_error(vars, ": Invalid number of arguments\n");
@@ -129,7 +98,6 @@ void remove_env_variable(vars_t *vars)
 char **existing_var, **new_env;
 unsigned int i, j;
 
-printf("Executing remove_env_variable function\n");
 if (vars->av[1] == NULL)
 {
 print_error(vars, ": Invalid number of arguments\n");
@@ -165,5 +133,53 @@ new_env[i] = NULL;
 free(*existing_var);
 free(vars->env);
 vars->env = new_env;
+vars->status = 0;
+}
+
+/**
+ * change_working_directory - Changes the current working directory
+ * @vars: Pointer to the struct of shell variables
+ * Return: Nothing
+ */
+void change_working_directory(vars_t *vars)
+{
+char *dir;
+char *cwd;
+char *pwd;
+
+if (vars->av[1] == NULL)
+{
+char **home_dir_ptr = find_env_var(vars->env, "HOME");
+char *home_dir = NULL;
+if (home_dir_ptr != NULL)
+home_dir = (*home_dir_ptr) + _strlen("HOME=");
+if (home_dir == NULL)
+print_error(vars, ": No home directory found\n");
+return;
+dir = home_dir;
+}
+else if (_strcmpr(vars->av[1], "-") == 0)
+{
+char **env_var = find_env_var(vars->env, "OLDPWD");
+char *old_dir = NULL;
+if (env_var != NULL)
+old_dir = (*env_var) + _strlen("OLDPWD=");
+if (old_dir == NULL)
+print_error(vars, ": OLDPWD not set\n");
+return;
+dir = old_dir;
+}
+else
+dir = vars->av[1];
+if (chdir(dir) != 0)
+{
+print_error(vars, ": No such file or directory\n");
+return;
+}
+pwd = find_env_var(vars->env, "PWD")[0];
+set_env_var(vars, "OLDPWD", pwd);
+cwd = getcwd(NULL, 0);
+set_env_var(vars, "PWD", cwd);
+free(cwd);
 vars->status = 0;
 }

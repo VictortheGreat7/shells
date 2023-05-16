@@ -37,17 +37,18 @@ int main(int argc __attribute__((unused)), char **argv, char **environment)
 {
 size_t len_buffer = 0;
 unsigned int is_pipe = 0, i;
-vars_t vars = {NULL, NULL, NULL, 0, NULL, 0, 0, NULL, 1};
-
+vars_t vars = {NULL, NULL, NULL, 0, NULL, 0, NULL, 1};
+vars.av = (char **) malloc(sizeof(char *));
+vars.av[0] = NULL;
 vars.argv = argv;
 vars.env = make_env(environment);
+
 signal(SIGINT, sigint_handler);
 if (!isatty(STDIN_FILENO))
 is_pipe = 1;
 if (is_pipe == 0)
 _puts("$ ");
 fflush(stdout);
-
 while (getline(&(vars.buffer), &len_buffer, stdin) != -1)
 {
 vars.count++;
@@ -56,8 +57,10 @@ for (i = 0; vars.commands && vars.commands[i] != NULL; i++)
 {
 vars.av = tokenize(vars.commands[i], "\n \t\r");
 if (vars.av && vars.av[0])
-if (find_builtin_command(&vars) == NULL)
-check_for_command(&vars);
+{
+void (*builtin_func)(vars_t *) = find_builtin_command(&vars);
+builtin_func != NULL ? builtin_func(&vars) : check_for_command(&vars);
+}
 free(vars.av);
 }
 free(vars.buffer);
