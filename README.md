@@ -1,6 +1,7 @@
 # Simple Shell Project
 
 This project is a simple implementation of a shell, written in C. It provides a basic shell interface for users to enter commands, and then executes those commands by creating child processes and using system calls to run them.
+This project was carried out by Great-victor Ajorin and Paul James.
 
 ## Files
 
