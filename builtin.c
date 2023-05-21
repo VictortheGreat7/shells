@@ -150,36 +150,34 @@ char *pwd;
 if (vars->av[1] == NULL)
 {
 char **home_dir_ptr = find_env_var(vars->env, "HOME");
-char *home_dir = NULL;
-if (home_dir_ptr != NULL)
-home_dir = (*home_dir_ptr) + _strlen("HOME=");
-if (home_dir == NULL)
-print_error(vars, ": No home directory found\n");
-return;
-dir = home_dir;
+char *home_dir = home_dir_ptr != NULL ? (*home_dir_ptr) + _strlen("HOME=") :
+NULL;
+dir = home_dir != NULL ? home_dir :
+(print_error(vars, ": No home directory found\n"), NULL);
 }
 else if (_strcmpr(vars->av[1], "-") == 0)
 {
 char **env_var = find_env_var(vars->env, "OLDPWD");
-char *old_dir = NULL;
-if (env_var != NULL)
-old_dir = (*env_var) + _strlen("OLDPWD=");
-if (old_dir == NULL)
-print_error(vars, ": OLDPWD not set\n");
-return;
-dir = old_dir;
+char *old_dir = env_var != NULL ? (*env_var) + _strlen("OLDPWD=") : NULL;
+dir = old_dir != NULL ? old_dir :
+(print_error(vars, ": OLDPWD not set\n"), NULL);
 }
 else
+{
 dir = vars->av[1];
+}
+
 if (chdir(dir) != 0)
 {
 print_error(vars, ": No such file or directory\n");
 return;
 }
+
 pwd = find_env_var(vars->env, "PWD")[0];
-set_env_var(vars, "OLDPWD", pwd);
+set_env_var(vars, "OLDPWD", pwd + _strlen("PWD="));
 cwd = getcwd(NULL, 0);
 set_env_var(vars, "PWD", cwd);
 free(cwd);
+
 vars->status = 0;
 }
