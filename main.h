@@ -40,8 +40,8 @@ void sigint_handler(int sig);
 int _putchar(char c);
 
 int execute_path_command(char *command, vars_t *vars);
-void (*find_builtin_command(vars_t *vars))(vars_t *vars);
 int execute_locally(vars_t *vars);
+void (*find_builtin_command(vars_t *vars))(vars_t *vars);
 void check_for_command(vars_t *vars);
 int is_command_in_path(char *str);
 

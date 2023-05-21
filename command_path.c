@@ -49,33 +49,6 @@ return (0);
 }
 
 /**
-* find_builtin_command - Checks if the command is a builtin
-* @vars: Pointer to the struct of shell variables
-* Return: Returns a pointer to the function or NULL
-*/
-void (*find_builtin_command(vars_t *vars))(vars_t *vars)
-{
-builtins_t builtins[] = {
-{"exit", perform_exit},
-{"env", print_env},
-{"setenv", add_env_variable},
-{"unsetenv", remove_env_variable},
-{"cd", change_working_directory},
-{NULL, NULL}
-};
-builtins_t *builtin;
-
-for (builtin = builtins; builtin->name != NULL; ++builtin)
-{
-if (_strcmpr(vars->av[0], builtin->name) == 0)
-{
-return (builtin->f);
-}
-}
-return (NULL);
-}
-
-/**
 * execute_locally - Executes the command in the current working directory
 * @vars: Pointer to the struct of shell variables
 * Return: 0 on success, 1 on failure
@@ -119,6 +92,33 @@ return (0);
 perror(vars->av[0]);
 vars->status = 127;
 return (0);
+}
+
+/**
+* find_builtin_command - Checks if the command is a builtin
+* @vars: Pointer to the struct of shell variables
+* Return: Returns a pointer to the function or NULL
+*/
+void (*find_builtin_command(vars_t *vars))(vars_t *vars)
+{
+builtins_t builtins[] = {
+{"exit", perform_exit},
+{"env", print_env},
+{"setenv", add_env_variable},
+{"unsetenv", remove_env_variable},
+{"cd", change_working_directory},
+{NULL, NULL}
+};
+builtins_t *builtin;
+
+for (builtin = builtins; builtin->name != NULL; ++builtin)
+{
+if (_strcmpr(vars->av[0], builtin->name) == 0)
+{
+return (builtin->f);
+}
+}
+return (NULL);
 }
 
 /**
