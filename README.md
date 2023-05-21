@@ -4,7 +4,7 @@ This project is a simple implementation of a shell, written in C. It provides a 
 
 ## Files
 
-- `main.c`: Contains the main function for the shell program, as well as several utility functions for handling input and executing commands.
+- `shell.c`: Contains the main function for the shell program, as well as several utility functions for handling input and executing commands.
 - `main.h`: Header file for the main program, containing function prototypes and definitions of data structures used in the program.
 
 ## Functions
