@@ -11,6 +11,9 @@
 #include <limits.h>
 #include <signal.h>
 
+#define AND_OP 1
+#define OR_OP 2
+#define NO_OP 0
 
 /**
 * struct variables - Shell's variables
@@ -22,6 +25,7 @@
 * @status: Exit status
 * @commands: Double pointer to commands
 * @line_num: Line number of the command
+* @next_op: Next operator flag
 */
 typedef struct variables
 {
@@ -33,16 +37,18 @@ char **argv;
 int status;
 char **commands;
 int line_num;
+int next_op;
 } vars_t;
 
 int main(int argc __attribute__((unused)), char **argv, char **environment);
 void sigint_handler(int sig);
 int _putchar(char c);
+int get_last_arg_index(char **args);
 
-int execute_path_command(char *command, vars_t *vars);
-int execute_locally(vars_t *vars);
 void (*find_builtin_command(vars_t *vars))(vars_t *vars);
+int execute_path_command(char *command, vars_t *vars);
 void check_for_command(vars_t *vars);
+int execute_locally(vars_t *vars);
 int is_command_in_path(char *str);
 
 /**

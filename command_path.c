@@ -1,6 +1,33 @@
 #include "main.h"
 
 /**
+* find_builtin_command - Checks if the command is a builtin
+* @vars: Pointer to the struct of shell variables
+* Return: Returns a pointer to the function or NULL
+*/
+void (*find_builtin_command(vars_t *vars))(vars_t *vars)
+{
+builtins_t builtins[] = {
+{"exit", perform_exit},
+{"env", print_env},
+{"setenv", add_env_variable},
+{"unsetenv", remove_env_variable},
+{"cd", change_working_directory},
+{NULL, NULL}
+};
+builtins_t *builtin;
+
+for (builtin = builtins; builtin->name != NULL; ++builtin)
+{
+if (_strcmpr(vars->av[0], builtin->name) == 0)
+{
+return (builtin->f);
+}
+}
+return (NULL);
+}
+
+/**
 * execute_path_command - Executes a command in the path
 * @command: Full path to the command
 * @vars: Pointer to the struct of shell variables
@@ -49,6 +76,67 @@ return (0);
 }
 
 /**
+* check_for_command - Checks if the command is in the PATH
+* @vars: Pointer to the struct of shell variables
+* Return: Nothing
+*/
+void check_for_command(vars_t *vars)
+{
+char *path, *check;
+unsigned int i, j = 0;
+char **path_tokens;
+struct stat buf;
+
+if (is_command_in_path(vars->av[0]))
+{
+j = execute_locally(vars);
+}
+else
+{
+path = getenv("PATH");
+if (!path)
+{
+dprintf(STDERR_FILENO, "./hsh: %d: %s: not found\n",
+vars->line_num, vars->av[0]);
+vars->status = 127;
+perform_exit(vars);
+}
+path_tokens = tokenize(path, ":");
+for (i = 0; path_tokens[i]; i++)
+{
+check = _strcat(path_tokens[i], vars->av[0]);
+if (stat(check, &buf) == 0)
+{
+j = execute_path_command(check, vars);
+free(check);
+break;
+}
+free(check);
+}
+free(path_tokens);
+
+if (!path_tokens[i])
+{
+dprintf(STDERR_FILENO, "./hsh: %d: %s: not found\n",
+vars->line_num, vars->av[0]);
+vars->status = 127;
+}
+}
+
+if (vars->next_op == AND_OP && vars->status != 0)
+{
+return;
+}
+else if (vars->next_op == OR_OP && vars->status == 0)
+{
+return;
+}
+
+if (j == 1)
+perform_exit(vars);
+}
+
+/**
 * execute_locally - Executes the command in the current working directory
 * @vars: Pointer to the struct of shell variables
 * Return: 0 on success, 1 on failure
@@ -92,82 +180,6 @@ return (0);
 perror(vars->av[0]);
 vars->status = 127;
 return (0);
-}
-
-/**
-* find_builtin_command - Checks if the command is a builtin
-* @vars: Pointer to the struct of shell variables
-* Return: Returns a pointer to the function or NULL
-*/
-void (*find_builtin_command(vars_t *vars))(vars_t *vars)
-{
-builtins_t builtins[] = {
-{"exit", perform_exit},
-{"env", print_env},
-{"setenv", add_env_variable},
-{"unsetenv", remove_env_variable},
-{"cd", change_working_directory},
-{NULL, NULL}
-};
-builtins_t *builtin;
-
-for (builtin = builtins; builtin->name != NULL; ++builtin)
-{
-if (_strcmpr(vars->av[0], builtin->name) == 0)
-{
-return (builtin->f);
-}
-}
-return (NULL);
-}
-
-/**
-* check_for_command - Checks if the command is in the PATH
-* @vars: Pointer to the struct of shell variables
-* Return: Nothing
-*/
-void check_for_command(vars_t *vars)
-{
-char *path, *check;
-unsigned int i, j = 0;
-char **path_tokens;
-struct stat buf;
-
-if (is_command_in_path(vars->av[0]))
-{
-j = execute_locally(vars);
-}
-else
-{
-path = getenv("PATH");
-if (!path)
-{
-dprintf(STDERR_FILENO, "./hsh: %d: %s: not found\n",
-vars->line_num, vars->av[0]);
-vars->status = 127;
-perform_exit(vars);
-}
-path_tokens = tokenize(path, ":");
-for (i = 0; path_tokens[i]; i++)
-{
-check = _strcat(path_tokens[i], vars->av[0]);
-if (stat(check, &buf) == 0)
-{
-j = execute_path_command(check, vars);
-free(check);
-break;
-}
-free(check);
-}
-free(path_tokens);
-
-if (!path_tokens[i])
-dprintf(STDERR_FILENO, "./hsh: %d: %s: not found\n",
-vars->line_num, vars->av[0]);
-vars->status = 127;
-}
-if (j == 1)
-perform_exit(vars);
 }
 
 /**
