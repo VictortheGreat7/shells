@@ -94,4 +94,4 @@ This will compile all C files in the current directory into an executable file n
 
 ## Usage
 
-To run the shell program, simply run the `hsh` executable file in the terminal. This will open the shell prompt (`$ `), where you can enter commands to execute. The shell supports several built-in commands (`exit`, `env`, `setenv`, `unsetenv`, `cd`) as well as commands in the PATH environment variable(ls, echo, pwd, and others). Enter `exit` to exit the shell program.
+To run the shell program, simply run the `hsh` executable file in the terminal. This will open the shell prompt (`$ `), where you can enter commands to execute. The shell supports several built-in commands (`exit`, `env`, `setenv`, `unsetenv`, `cd`) as well as commands in the PATH environment variable(`ls`, `echo`, `pwd`, and others). Enter `exit` to exit the shell program.
