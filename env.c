@@ -5,7 +5,6 @@
 * @env: The environment passed into main
 * Return: Pointer to the new environment
 */
-
 char **make_env(char **env)
 {
 char **new_env = NULL;
@@ -30,7 +29,6 @@ return (new_env);
 * @env: The shell's environment
 * Return: Nothing
 */
-
 void free_env(char **env)
 {
 unsigned int i;

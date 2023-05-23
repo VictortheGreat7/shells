@@ -16,13 +16,13 @@ This project is a simple implementation of a shell, written in C. It provides a 
 - `int _putchar(char c)`: Writes a character to standard output.
 
 
-- `int execute_path_command(char *command, vars_t *vars)`: This function executes a command specified by a full path. It first checks if the user has permission to execute the command. If not, it prints an error message and returns 1. It then forks a new process and executes the command with the arguments and environment variables passed in vars. If an error occurs, it prints an error message and exits with status code 127. Otherwise, it waits for the child process to finish and sets the exit status to the child process's exit status.
-
-- `int execute_locally(vars_t *vars)`: This function executes the command in the current working directory. It first checks if the file exists and is executable. If not, it prints an error message and returns 1. It then forks a new process and executes the command with the arguments and environment variables passed in vars. If an error occurs, it prints an error message and sets the exit status to 127. Otherwise, it waits for the childprocess to finish and sets the exit status to the child process's exit status.
-
 - `void (*find_builtin_command(vars_t *vars))(vars_t *vars)`: This function checks if the command specified in vars->av[0] is a built-in command. It loops through an array of builtins_t structures and compares the command name with vars->av[0]. If a match is found, it returns a pointer to the corresponding function. Otherwise, it returns NULL.
 
 - `void check_for_command(vars_t *vars)`: This function checks if the command specified in vars->av[0] is in the PATH environment variable. If it is, it executes it with execute_locally(). Otherwise, it loops through each directory in the PATH and checks if the command exists in that directory with execute_path_command(). If the command is not found in any directory, it prints an error message and sets the exit status to 127.
+
+- `int execute_path_command(char *command, vars_t *vars)`: This function executes a command specified by a full path. It first checks if the user has permission to execute the command. If not, it prints an error message and returns 1. It then forks a new process and executes the command with the arguments and environment variables passed in vars. If an error occurs, it prints an error message and exits with status code 127. Otherwise, it waits for the child process to finish and sets the exit status to the child process's exit status.
+
+- `int execute_locally(vars_t *vars)`: This function executes the command in the current working directory. It first checks if the file exists and is executable. If not, it prints an error message and returns 1. It then forks a new process and executes the command with the arguments and environment variables passed in vars. If an error occurs, it prints an error message and sets the exit status to 127. Otherwise, it waits for the childprocess to finish and sets the exit status to the child process's exit status.
 
 - `int is_command_in_path(char *str)`: This function checks if the command string str contains a forward slash /, indicating that the command is specified by a full path. If it does, it returns 1. Otherwise, it returns 0.
 
@@ -45,6 +45,8 @@ This project is a simple implementation of a shell, written in C. It provides a 
 - `char **find_env_var(char **env, char *key)`: This function searches the array of environment variables env for an environment variable with the name key. It first determines the length of key and then iterates through env with a for loop, comparing each environment variable to key. If a match is found, it returns a pointer to the address of the environment variable. If no match is found, it returns NULL
 
 - `int _atoi(char *str)`: This function converts a string str into an integer and returns the resulting integer. It first determines the maximum number of digits an integer can have on the current system and stores it in digits. It then iterates through the string with a for loop, multiplying num by 10 and adding the value of the current digit until the end of the string or digits is reached. If a non-digit character is encountered, it returns -1. If the resulting integer overflows or underflows, it returns -1. Finally, it returns the resulting integer.
+
+- `int _strncmp(const char *str1, const char *str2, size_t num)`: This function compares the first num characters of two strings str1 and str2. It returns an integer indicating their relative order, with a negative value if str1 is less than str2, a positive value if str1 is greater than str2, and 0 if they are equal up to num characters.
 
 
 - char **make_env(char **env)`: This function creates a new environment for the shell based on the environment variables passed into it. It first counts the number of environment variables in env. It then allocates memory for a new array of strings new_env with size i+1, where i is the number of environment variables. It then copies each environment variable into the new array with _strdup(). Finally, it adds a NULL terminator to the end of the new array and returns a pointer to it.
@@ -92,5 +94,4 @@ This will compile all C files in the current directory into an executable file n
 
 ## Usage
 
-To run the shell program, simply run the `hsh` executable file in the terminal. This will open the shell prompt (`$ `), where you can enter commands to execute. The shell supports several built-in commands (`exit`, `env`, `setenv`, `unsetenv`, `cd`) as well as external commands. Enter `exit` to exit the shell program.
-
+To run the shell program, simply run the `hsh` executable file in the terminal. This will open the shell prompt (`$ `), where you can enter commands to execute. The shell supports several built-in commands (`exit`, `env`, `setenv`, `unsetenv`, `cd`) as well as commands in the PATH environment variable(ls, echo, pwd, and others). Enter `exit` to exit the shell program.

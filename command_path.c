@@ -28,6 +28,55 @@ return (NULL);
 }
 
 /**
+* check_for_command - Checks if the command is in the PATH
+* @vars: Pointer to the struct of shell variables
+* Return: Nothing
+*/
+void check_for_command(vars_t *vars)
+{
+char *path, *path_copy, **path_tokens, *check, **env = environ;
+unsigned int i, j = 0;
+int command_found = 0;
+
+if (is_command_in_path(vars->av[0]))
+j = execute_locally(vars);
+else
+{
+while (*env && (_strncmp(*env, "PATH=", 5) || !(path = *env + 5)))
+env++;
+if (!path)
+{
+dprintf(STDERR_FILENO, "./hsh: %d: %s: not found\n", vars->ln, vars->av[0]);
+vars->status = 127, perform_exit(vars);
+}
+path_copy = _strdup(path);
+if (!path_copy)
+{
+perror("Fatal Error");
+return;
+}
+path_tokens = tokenize(path_copy, ":");
+for (i = 0; path_tokens[i]; i++)
+{
+check = _strcat(path_tokens[i], vars->av[0]);
+if (access(check, F_OK) == 0)
+{
+j = execute_path_command(check, vars), free(check);
+command_found = 1;
+break;
+}
+free(check);
+}
+free(path_tokens), free(path_copy);
+if (!command_found)
+dprintf(STDERR_FILENO, "./hsh: %d: %s: not found\n", vars->ln, vars->av[0]);
+vars->status = 127;
+}
+if (j == 1)
+perform_exit(vars);
+}
+
+/**
 * execute_path_command - Executes a command in the path
 * @command: Full path to the command
 * @vars: Pointer to the struct of shell variables
@@ -73,67 +122,6 @@ vars->status = 130;
 }
 return (0);
 }
-}
-
-/**
-* check_for_command - Checks if the command is in the PATH
-* @vars: Pointer to the struct of shell variables
-* Return: Nothing
-*/
-void check_for_command(vars_t *vars)
-{
-char *path, *check;
-unsigned int i, j = 0;
-char **path_tokens;
-struct stat buf;
-
-if (is_command_in_path(vars->av[0]))
-{
-j = execute_locally(vars);
-}
-else
-{
-path = getenv("PATH");
-if (!path)
-{
-dprintf(STDERR_FILENO, "./hsh: %d: %s: not found\n",
-vars->line_num, vars->av[0]);
-vars->status = 127;
-perform_exit(vars);
-}
-path_tokens = tokenize(path, ":");
-for (i = 0; path_tokens[i]; i++)
-{
-check = _strcat(path_tokens[i], vars->av[0]);
-if (stat(check, &buf) == 0)
-{
-j = execute_path_command(check, vars);
-free(check);
-break;
-}
-free(check);
-}
-free(path_tokens);
-
-if (!path_tokens[i])
-{
-dprintf(STDERR_FILENO, "./hsh: %d: %s: not found\n",
-vars->line_num, vars->av[0]);
-vars->status = 127;
-}
-}
-
-if (vars->next_op == AND_OP && vars->status != 0)
-{
-return;
-}
-else if (vars->next_op == OR_OP && vars->status == 0)
-{
-return;
-}
-
-if (j == 1)
-perform_exit(vars);
 }
 
 /**

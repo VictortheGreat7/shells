@@ -112,3 +112,24 @@ if (i > digits)
 return (-1);
 return (num);
 }
+
+/**
+* _strncmp - Compares a maximum of num bytes of two strings
+* @str1: First string to be compared
+* @str2: Second string to be compared
+* @num: The maximum number of bytes to compare
+* Return: 0 if sucessful, a negative value or a positive value if failed
+*/
+int _strncmp(const char *str1, const char *str2, size_t num)
+{
+size_t i;
+
+for (i = 0; i < num; i++)
+{
+if (str1[i] != str2[i])
+return (str1[i] - str2[i]);
+else if (str1[i] == '\0')
+return (0);
+}
+return (0);
+}

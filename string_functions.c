@@ -57,8 +57,8 @@ return (copy);
 
 /**
 * _strcmpr - Compares two strings
-* @strcmp1: First string, of two, to be compared
-* @strcmp2: Second string, of two, to be compared
+* @strcmp1: First string to be compared
+* @strcmp2: Second string to be compared
 * Return: 0 on success or the ASCII diff of the differing chars, if failed
 */
 int _strcmpr(char *strcmp1, char *strcmp2)
@@ -71,7 +71,6 @@ if (strcmp1[i] == '\0')
 return (0);
 i++;
 }
-
 return (strcmp1[i] - strcmp2[i]);
 }
 
@@ -96,7 +95,6 @@ else
 for (len1 = 0; strct1[len1]; len1++)
 ;
 }
-
 if (strct2 == NULL)
 len2 = 0;
 else
@@ -104,20 +102,15 @@ else
 for (len2 = 0; strct2[len2]; len2++)
 ;
 }
-
 new_len = len1 + len2 + 2;
 new_string = malloc(new_len *sizeof(char));
-
 if (new_string == NULL)
 return (NULL);
-
 for (i = 0; i < len1; i++)
 new_string[i] = strct1[i];
 new_string[i] = '/';
-
 for (j = 0; j < len2; j++)
 new_string[i + 1 + j] = strct2[j];
 new_string[len1 + len2 + 1] = '\0';
-
 return (new_string);
 }
