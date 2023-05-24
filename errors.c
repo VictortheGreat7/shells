@@ -10,27 +10,27 @@ void print_error(vars_t *vars, char *msg)
 {
 char *count;
 
-_puts2(vars->argv[0]);
-_puts2(": ");
+error_puts(vars->argv[0]);
+error_puts(": ");
 count = uint_to_ascii(vars->count);
-_puts2(count);
+error_puts(count);
 free(count);
-_puts2(": ");
-_puts2(vars->av[0]);
+error_puts(": ");
+error_puts(vars->av[0]);
 if (msg)
 {
-_puts2(msg);
+error_puts(msg);
 }
 else
 perror("");
 }
 
 /**
-* _puts2 - Prints a string to standard error
+* error_puts - Prints a string to standard error
 * @str: String to be printed
 * Return: Nothing
 */
-void _puts2(char *str)
+void error_puts(char *str)
 {
 ssize_t num, len;
 

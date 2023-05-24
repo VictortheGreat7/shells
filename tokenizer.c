@@ -1,12 +1,12 @@
 #include "main.h"
 
 /**
-* tokenize - Tokenizes a buffer with a delimiter
+* tokenizer - Tokenizes a buffer with a delimiter
 * @buffer: Buffer to be tokenized
 * @delimiter: Delimiter to be tokenized with
 * Return: Pointer to an array of pointers to tokens
 */
-char **tokenize(char *buffer, char *delimiter)
+char **tokenizer(char *buffer, char *delimiter)
 {
 char **tokens = NULL;
 size_t i = 0, mcount = TOKENS_INITIAL_CAPACITY;
@@ -86,7 +86,7 @@ if (token_start == NULL)
 return (NULL);
 for (i = 0; current_position[i] != '\0'; i++)
 {
-if (string_match(current_position[i], delim) == 0)
+if (match_string(current_position[i], delim) == 0)
 break;
 }
 
@@ -99,7 +99,7 @@ token_start = current_position + i;
 current_position = token_start;
 for (i = 0; current_position[i] != '\0'; i++)
 {
-if (string_match(current_position[i], delim) == 1)
+if (match_string(current_position[i], delim) == 1)
 break;
 }
 
@@ -116,12 +116,12 @@ return (token_start);
 }
 
 /**
-* string_match - Checks if a character matches any in a string
+* match_string - Checks if a character matches any in a string
 * @c: Character to be checked
 * @str: String to be checked
 * Return: 1 if it matches, 0 if it does not
 */
-unsigned int string_match(char c, const char *str)
+unsigned int match_string(char c, const char *str)
 {
 unsigned int i;
 

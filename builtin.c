@@ -1,11 +1,11 @@
 #include "main.h"
 
 /**
-* perform_exit - Exits the shell
+* _exit_shell - Exits the shell
 * @vars: Pointer to the struct of shell variables
 * Return: Nothing
 */
-void perform_exit(vars_t *vars)
+void _exit_shell(vars_t *vars)
 {
 int exit_status;
 
@@ -16,8 +16,8 @@ if (exit_status == -1)
 {
 vars->status = 2;
 print_error(vars, ": Invalid number format: ");
-_puts2(vars->av[1]);
-_puts2("\n");
+error_puts(vars->av[1]);
+error_puts("\n");
 return;
 }
 vars->status = exit_status;
@@ -29,16 +29,16 @@ vars->status = 0;
 free(vars->buffer);
 free(vars->av);
 free(vars->commands);
-free_env(vars->env);
+free_environ(vars->env);
 exit(vars->status);
 }
 
 /**
-* print_env - Prints the current environment
+* print_env_vars - Prints the current environment
 * @vars: Pointer to the struct of shell variables
 * Return: Nothing
 */
-void print_env(vars_t *vars)
+void print_env_vars(vars_t *vars)
 {
 unsigned int i;
 
@@ -51,11 +51,11 @@ vars->status = 0;
 }
 
 /**
-* add_env_variable - Creates an environment variable or edits an existing one
+* add_env_var - Creates an environment variable or edits an existing one
 * @vars: Pointer to the struct of shell variables
 * Return: Nothing
 */
-void add_env_variable(vars_t *vars)
+void add_env_var(vars_t *vars)
 {
 char **existing_var;
 char *new_value;
@@ -67,19 +67,19 @@ vars->status = 2;
 return;
 }
 
-existing_var = find_env_var(vars->env, vars->av[1]);
+existing_var = find_environ_var(vars->env, vars->av[1]);
 if (existing_var == NULL)
-create_env_var(vars);
+create_environ_var(vars);
 else
 {
-new_value = create_env_string(vars->av[1], vars->av[2]);
+new_value = create_environ_string(vars->av[1], vars->av[2]);
 if (new_value == NULL)
 {
 perror("Error");
 free(vars->buffer);
 free(vars->commands);
 free(vars->av);
-free_env(vars->env);
+free_environ(vars->env);
 exit(127);
 }
 free(*existing_var);
@@ -89,11 +89,11 @@ vars->status = 0;
 }
 
 /**
-* remove_env_variable - Remove an environment variable
+* remove_env_var - Remove an environment variable
 * @vars: Pointer to the struct of shell variables
 * Return: Nothing
 */
-void remove_env_variable(vars_t *vars)
+void remove_env_var(vars_t *vars)
 {
 char **existing_var, **new_env;
 unsigned int i, j;
@@ -105,7 +105,7 @@ vars->status = 2;
 return;
 }
 
-existing_var = find_env_var(vars->env, vars->av[1]);
+existing_var = find_environ_var(vars->env, vars->av[1]);
 if (existing_var == NULL)
 {
 print_error(vars, ": There is no variable to remove");
@@ -120,7 +120,7 @@ if (new_env == NULL)
 {
 perror("Error");
 vars->status = 127;
-perform_exit(vars);
+_exit_shell(vars);
 }
 
 for (i = 0; vars->env[i] != *existing_var; i++)
@@ -149,7 +149,7 @@ char *previous_working_dir;
 
 if (vars->av[1] == NULL)
 {
-char **home_dir_ptr = find_env_var(vars->env, "HOME");
+char **home_dir_ptr = find_environ_var(vars->env, "HOME");
 char *home_dir = home_dir_ptr != NULL ? (*home_dir_ptr) + _strlen("HOME=") :
 NULL;
 desired_dir = home_dir != NULL ? home_dir :
@@ -157,7 +157,7 @@ desired_dir = home_dir != NULL ? home_dir :
 }
 else if (_strcmpr(vars->av[1], "-") == 0)
 {
-char **env_var = find_env_var(vars->env, "OLDPWD");
+char **env_var = find_environ_var(vars->env, "OLDPWD");
 char *old_dir = env_var != NULL ? (*env_var) + _strlen("OLDPWD=") : NULL;
 desired_dir = old_dir != NULL ? old_dir :
 (print_error(vars, ": OLDPWD not set\n"), NULL);
@@ -173,7 +173,7 @@ print_error(vars, ": No such file or directory\n");
 return;
 }
 
-previous_working_dir = find_env_var(vars->env, "PWD")[0];
+previous_working_dir = find_environ_var(vars->env, "PWD")[0];
 set_env_var(vars, "OLDPWD", previous_working_dir + _strlen("PWD="));
 current_working_dir = getcwd(NULL, 0);
 set_env_var(vars, "PWD", current_working_dir);

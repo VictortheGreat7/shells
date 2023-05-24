@@ -36,14 +36,16 @@ int ln;
 } vars_t;
 
 int main(int argc __attribute__((unused)), char **argv, char **environment);
-void sigint_handler(int sig);
+void handle_sigint(int sig);
 int _putchar(char c);
 
-void (*find_builtin_command(vars_t *vars))(vars_t *vars);
-void check_for_command(vars_t *vars);
-int execute_path_command(char *command, vars_t *vars);
-int execute_locally(vars_t *vars);
-int is_command_in_path(char *str);
+extern char **environ;
+
+void (*find_builtin(vars_t *vars))(vars_t *vars);
+void check_command(vars_t *vars);
+int execute_command_in_path(char *command, vars_t *vars);
+int local_execute(vars_t *vars);
+int command_is_in_path(char *str);
 
 /**
 * struct builtins - Struct for the builtin functions
@@ -56,28 +58,28 @@ char *name;
 void (*f)(vars_t *);
 } builtins_t;
 
-void perform_exit(vars_t *vars);
-void print_env(vars_t *vars);
-void add_env_variable(vars_t *vars);
-void remove_env_variable(vars_t *vars);
+void _exit_shell(vars_t *vars);
+void print_env_vars(vars_t *vars);
+void add_env_var(vars_t *vars);
+void remove_env_var(vars_t *vars);
 void change_working_directory(vars_t *vars);
 
-void create_env_var(vars_t *vars);
-char *create_env_string(char *key, char *value);
-char **find_env_var(char **env, char *key);
+void create_environ_var(vars_t *vars);
+char *create_environ_string(char *key, char *value);
+char **find_environ_var(char **env, char *key);
 int _atoi(char *str);
 int _strncmp(const char *str1, const char *str2, size_t num);
 
-char **make_env(char **env);
-void free_env(char **env);
+char **make_environ(char **env);
+void free_environ(char **env);
 void set_env_var(vars_t *vars, char *key, char *value);
 
 #define TOKENS_INITIAL_CAPACITY 10
 
-char **tokenize(char *buffer, char *delimiter);
+char **tokenizer(char *buffer, char *delimiter);
 char **_realloc(char **ptr, size_t *size);
 char *_strtok(char *str, const char *delim);
-unsigned int string_match(char c, const char *str);
+unsigned int match_string(char c, const char *str);
 
 ssize_t _puts(char *str);
 unsigned int _strlen(char *str);
@@ -86,7 +88,7 @@ int _strcmpr(char *strcmp1, char *strcmp2);
 char *_strcat(char *strct1, char *strct2);
 
 void print_error(vars_t *vars, char *msg);
-void _puts2(char *str);
+void error_puts(char *str);
 char *uint_to_ascii(unsigned int count);
 
 #endif

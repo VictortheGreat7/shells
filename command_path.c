@@ -1,17 +1,17 @@
 #include "main.h"
 
 /**
-* find_builtin_command - Checks if the command is a builtin
+* find_builtin - Checks if the command is a builtin
 * @vars: Pointer to the struct of shell variables
 * Return: Returns a pointer to the function or NULL
 */
-void (*find_builtin_command(vars_t *vars))(vars_t *vars)
+void (*find_builtin(vars_t *vars))(vars_t *vars)
 {
 builtins_t builtins[] = {
-{"exit", perform_exit},
-{"env", print_env},
-{"setenv", add_env_variable},
-{"unsetenv", remove_env_variable},
+{"exit", _exit_shell},
+{"env", print_env_vars},
+{"setenv", add_env_var},
+{"unsetenv", remove_env_var},
 {"cd", change_working_directory},
 {NULL, NULL}
 };
@@ -28,25 +28,26 @@ return (NULL);
 }
 
 /**
-* check_for_command - Checks if the command is in the PATH
+* check_command - Checks if the command is in the PATH
 * @vars: Pointer to the struct of shell variables
 * Return: Nothing
 */
-void check_for_command(vars_t *vars)
+void check_command(vars_t *vars)
 {
-char *path, *path_copy, **path_tokens, *check;
+char *path, *path_copy, **path_tokens, *check, **env = environ;
 unsigned int i, j = 0;
 int command_found = 0;
 
-if (is_command_in_path(vars->av[0]))
-j = execute_locally(vars);
+if (command_is_in_path(vars->av[0]))
+j = local_execute(vars);
 else
 {
-path = getenv("PATH");
+while (*env && (_strncmp(*env, "PATH=", 5) || !(path = *env + 5)))
+env++;
 if (!path)
 {
 dprintf(STDERR_FILENO, "./hsh: %d: %s: not found\n", vars->ln, vars->av[0]);
-vars->status = 127, perform_exit(vars);
+vars->status = 127, _exit_shell(vars);
 }
 path_copy = _strdup(path);
 if (!path_copy)
@@ -54,13 +55,13 @@ if (!path_copy)
 perror("Fatal Error");
 return;
 }
-path_tokens = tokenize(path_copy, ":");
+path_tokens = tokenizer(path_copy, ":");
 for (i = 0; path_tokens[i]; i++)
 {
 check = _strcat(path_tokens[i], vars->av[0]);
 if (access(check, F_OK) == 0)
 {
-j = execute_path_command(check, vars), free(check);
+j = execute_command_in_path(check, vars), free(check);
 command_found = 1;
 break;
 }
@@ -72,16 +73,16 @@ dprintf(STDERR_FILENO, "./hsh: %d: %s: not found\n", vars->ln, vars->av[0]);
 vars->status = 127;
 }
 if (j == 1)
-perform_exit(vars);
+_exit_shell(vars);
 }
 
 /**
-* execute_path_command - Executes a command in the path
+* execute_command_in_path - Executes a command in the path
 * @command: Full path to the command
 * @vars: Pointer to the struct of shell variables
 * Return: 0 on success, 1 if failed
 */
-int execute_path_command(char *command, vars_t *vars)
+int execute_command_in_path(char *command, vars_t *vars)
 {
 pid_t pid = fork();
 int status;
@@ -124,11 +125,11 @@ return (0);
 }
 
 /**
-* execute_locally - Executes the command in the current working directory
+* local_execute - Executes the command in the current working directory
 * @vars: Pointer to the struct of shell variables
 * Return: 0 on success, 1 on failure
 */
-int execute_locally(vars_t *vars)
+int local_execute(vars_t *vars)
 {
 pid_t pid;
 struct stat buf;
@@ -170,11 +171,11 @@ return (0);
 }
 
 /**
-* is_command_in_path - Checks if the command is part of a path
+* command_is_in_path - Checks if the command is part of a path
 * @str: The command string
 * Return: 1 on success, 0 on failure
 */
-int is_command_in_path(char *str)
+int command_is_in_path(char *str)
 {
 unsigned int i;
 

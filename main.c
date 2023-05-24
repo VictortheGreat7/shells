@@ -12,12 +12,11 @@ int main(int argc __attribute__((unused)), char **argv, char **environment)
 size_t buffer_len = 0;
 unsigned int is_pipe = 0, i;
 vars_t vars = {NULL, NULL, NULL, 0, NULL, 0, NULL, 1};
-vars.av = (char **) malloc(sizeof(char *));
-vars.av[0] = NULL;
-vars.argv = argv;
-vars.env = make_env(environment);
 
-signal(SIGINT, sigint_handler);
+vars.argv = argv;
+vars.env = make_environ(environment);
+
+signal(SIGINT, handle_sigint);
 if (!isatty(STDIN_FILENO))
 is_pipe = 1;
 if (is_pipe == 0)
@@ -26,14 +25,14 @@ fflush(stdout);
 while (getline(&(vars.buffer), &buffer_len, stdin) != -1)
 {
 vars.count++;
-vars.commands = tokenize(vars.buffer, ";");
+vars.commands = tokenizer(vars.buffer, ";");
 for (i = 0; vars.commands && vars.commands[i] != NULL; i++)
 {
-vars.av = tokenize(vars.commands[i], "\n \t\r");
+vars.av = tokenizer(vars.commands[i], "\n \t\r");
 if (vars.av && vars.av[0])
 {
-void (*builtin_func)(vars_t *) = find_builtin_command(&vars);
-builtin_func != NULL ? builtin_func(&vars) : check_for_command(&vars);
+void (*builtin_func)(vars_t *) = find_builtin(&vars);
+builtin_func != NULL ? builtin_func(&vars) : check_command(&vars);
 }
 free(vars.av);
 }
@@ -46,17 +45,17 @@ fflush(stdout);
 }
 if (is_pipe == 0)
 _puts("\n");
-free_env(vars.env);
+free_environ(vars.env);
 free(vars.buffer);
 exit(vars.status);
 }
 
 /**
-* sigint_handler - Handles the SIGINT signal sent to the process
+* handle_sigint - Handles the SIGINT signal sent to the process
 * @sig: The signal number
 * Return: Nothing
 */
-void sigint_handler(int sig)
+void handle_sigint(int sig)
 {
 (void)sig;
 _putchar('\n');

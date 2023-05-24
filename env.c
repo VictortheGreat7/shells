@@ -1,11 +1,11 @@
 #include "main.h"
 
 /**
-* make_env - Makes a shell environment from the environment passed into main
+* make_environ - Makes a shell environ from the environ passed into main
 * @env: The environment passed into main
 * Return: Pointer to the new environment
 */
-char **make_env(char **env)
+char **make_environ(char **env)
 {
 char **new_env = NULL;
 size_t i;
@@ -25,11 +25,11 @@ return (new_env);
 }
 
 /**
-* free_env - Frees the shell's environment
+* free_environ - Frees the shell's environment
 * @env: The shell's environment
 * Return: Nothing
 */
-void free_env(char **env)
+void free_environ(char **env)
 {
 unsigned int i;
 
@@ -46,28 +46,28 @@ free(env);
 */
 void set_env_var(vars_t *vars, char *key, char *value)
 {
-char **env_var = find_env_var(vars->env, key);
-char **new_env_var = find_env_var(vars->env, key);
+char **env_var = find_environ_var(vars->env, key);
+char **new_env_var = find_environ_var(vars->env, key);
 if (env_var != NULL)
 {
 free(*env_var);
-*env_var = create_env_string(key, value);
+*env_var = create_environ_string(key, value);
 if (*env_var == NULL)
 {
 perror("Error");
 vars->status = 127;
-perform_exit(vars);
+_exit_shell(vars);
 }
 }
 else
 {
-create_env_var(vars);
-*new_env_var = create_env_string(key, value);
+create_environ_var(vars);
+*new_env_var = create_environ_string(key, value);
 if (*new_env_var == NULL)
 {
 perror("Error");
 vars->status = 127;
-perform_exit(vars);
+_exit_shell(vars);
 }
 }
 }

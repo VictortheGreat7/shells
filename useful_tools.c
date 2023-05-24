@@ -1,11 +1,11 @@
 #include "main.h"
 
 /**
-* create_env_var - Create a new environment variable
+* create_environ_var - Create a new environment variable
 * @vars: Pointer to the struct of shell variables
 * Return: Nothing
 */
-void create_env_var(vars_t *vars)
+void create_environ_var(vars_t *vars)
 {
 unsigned int i;
 char **new_env;
@@ -17,18 +17,18 @@ if (new_env == NULL)
 {
 perror("Error");
 vars->status = 127;
-perform_exit(vars);
+_exit_shell(vars);
 }
 for (i = 0; vars->env[i] != NULL; i++)
 new_env[i] = vars->env[i];
-new_env[i] = create_env_string(vars->av[1], vars->av[2]);
+new_env[i] = create_environ_string(vars->av[1], vars->av[2]);
 if (new_env[i] == NULL)
 {
 perror("Error");
 free(vars->buffer);
 free(vars->commands);
 free(vars->av);
-free_env(vars->env);
+free_environ(vars->env);
 free(new_env);
 exit(127);
 }
@@ -38,12 +38,12 @@ vars->env = new_env;
 }
 
 /**
-* create_env_string - Create a new environment variable string
+* create_environ_string - Create a new environment variable string
 * @key: Name of the environment variable
 * @value: Value of the environment variable
 * Return: Pointer to the new string;
 */
-char *create_env_string(char *key, char *value)
+char *create_environ_string(char *key, char *value)
 {
 unsigned int len1, len2, i, j;
 char *new_env_string;
@@ -63,12 +63,12 @@ return (new_env_string);
 }
 
 /**
-* find_env_var - Finds an environment variable
+* find_environ_var - Finds an environment variable
 * @env: Array of environment variables
 * @key: Environment variable to find
 * Return: Pointer to address of the environment variable
 */
-char **find_env_var(char **env, char *key)
+char **find_environ_var(char **env, char *key)
 {
 unsigned int i, j, len;
 
