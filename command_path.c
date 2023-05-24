@@ -85,7 +85,7 @@ _exit_shell(vars);
 int execute_command_in_path(char *command, vars_t *vars)
 {
 pid_t pid = fork();
-int status;
+int status = vars->status;
 
 if (access(command, X_OK) == -1)
 {
