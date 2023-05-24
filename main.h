@@ -39,8 +39,6 @@ int main(int argc __attribute__((unused)), char **argv, char **environment);
 void sigint_handler(int sig);
 int _putchar(char c);
 
-extern char **environ;
-
 void (*find_builtin_command(vars_t *vars))(vars_t *vars);
 void check_for_command(vars_t *vars);
 int execute_path_command(char *command, vars_t *vars);

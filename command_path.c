@@ -34,7 +34,7 @@ return (NULL);
 */
 void check_for_command(vars_t *vars)
 {
-char *path, *path_copy, **path_tokens, *check, **env = environ;
+char *path, *path_copy, **path_tokens, *check;
 unsigned int i, j = 0;
 int command_found = 0;
 
@@ -42,8 +42,7 @@ if (is_command_in_path(vars->av[0]))
 j = execute_locally(vars);
 else
 {
-while (*env && (_strncmp(*env, "PATH=", 5) || !(path = *env + 5)))
-env++;
+path = getenv("PATH");
 if (!path)
 {
 dprintf(STDERR_FILENO, "./hsh: %d: %s: not found\n", vars->ln, vars->av[0]);
